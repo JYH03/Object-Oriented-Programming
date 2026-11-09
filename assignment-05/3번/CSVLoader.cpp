@@ -1,115 +1,65 @@
 #include "CSVLoader.h"
-CSVLoader::CSVLoader()
-{
-	cols = 0;
-	rows = 0;
-	data = NULL;
+using namespace std;
+CSVLoader::CSVLoader() : data(NULL), cols(0), rows(0) {}
+CSVLoader::CSVLoader(const char* path) : data(NULL), cols(0), rows(0) { parse(path); }
+CSVLoader::~CSVLoader() { clear(); }
+void CSVLoader::clear() {
+    for (int i=0; i<rows; ++i) delete[] data[i];
+    delete[] data; data=NULL; rows=0; cols=0;
 }
-CSVLoader::CSVLoader(const char* path)
-{
-	data = NULL;
-	cols = 0;
-	rows = 0;
-	parse("CSVLoader_Data.txt");
+float** CSVLoader::getData() const { return data; }
+int CSVLoader::getRows() const { return rows; }
+int CSVLoader::getCols() const { return cols; }
+// ì›ë³¸ ê³¼ì œì˜ 128ì¹¸ ì œí•œ ì•ˆì—ì„œ í•œ ì¤„ì„ ìˆ«ìžë¡œ ë³€í™˜í•œë‹¤.
+static bool parseRow(const char* line, float* values, int& count) {
+    count=0; int i=0;
+    while (line[i]!='\0') {
+        while (line[i]==' ' || line[i]=='\t') ++i;
+        int start=i, digits=0;
+        if (line[i]=='+' || line[i]=='-') ++i;
+        while (line[i]>='0' && line[i]<='9') { ++i; ++digits; }
+        if (line[i]=='.') { ++i; while (line[i]>='0' && line[i]<='9') { ++i; ++digits; } }
+        if (!digits || count >= 128) return false;
+        if (line[i]=='e' || line[i]=='E') {
+            ++i; if (line[i]=='+' || line[i]=='-') ++i;
+            int expDigits=0;
+            while (line[i]>='0' && line[i]<='9') { ++i; ++expDigits; }
+            if (!expDigits) return false;
+        }
+        values[count++]=static_cast<float>(atof(line+start));
+        while (line[i]==' ' || line[i]=='\t' || line[i]=='\r') ++i;
+        if (line[i]=='\0') break;
+        if (line[i++]!=',' || line[i]=='\0') return false;
+    }
+    return count>0;
 }
-CSVLoader::~CSVLoader()
-{
-	for (int i = 0; i < rows; i++)
-		delete[] data[i];
-	delete[] data;
+void CSVLoader::parse(const char* path) {
+    ifstream fin(path);
+    if (!fin) { cerr << "Cannot open CSV file" << endl; return; }
+    float temporary[128][128];
+    char line[128]; int newRows=0, newCols=0;
+    while (fin.getline(line,128)) {
+        if (line[0]=='\0') continue;
+        if (newRows==128) { cerr << "Too many rows" << endl; return; }
+        int count=0;
+        if (!parseRow(line,temporary[newRows],count) || (newRows>0 && count!=newCols)) {
+            cerr << "Invalid CSV data" << endl; return;
+        }
+        if (newRows==0) newCols=count;
+        ++newRows;
+    }
+    if (!fin.eof()) { cerr << "CSV read error" << endl; return; }
+    float** next = newRows ? new float*[newRows] : NULL;
+    for (int i=0; i<newRows; ++i) {
+        next[i]=new float[newCols];
+        for (int j=0; j<newCols; ++j) next[i][j]=temporary[i][j];
+    }
+    clear(); data=next; rows=newRows; cols=newCols;
 }
-float** CSVLoader::getData() const
-{
-	return data;				//privateÀÇ data °ª ºÒ·¯¿À±â
-}
-int CSVLoader::getRows() const
-{
-	return rows;				//privateÀÇ rows °ª ºÒ·¯¿À±â
-}
-int CSVLoader::getCols() const
-{
-	return cols;				//privateÀÇ cols °ª ºÒ·¯¿À±â
-}
-void CSVLoader::parse(const char* path)
-{
-	int i, j = 0, cnt = 0, key = 0, k = 0;
-	//ÆÄÀÏÀÇ ³»¿ëÀ» ÀÔ·Â¹ÞÀ» ÀÌÁß Æ÷ÀÎÅÍ º¯¼ö ¸Þ¸ð¸®ÇÒ´ç
-	char** DATA = new char* [MAX_BUFFER_SIZE];
-	for (i = 0; i < MAX_BUFFER_SIZE; i++)
-		DATA[i] = new char[MAX_BUFFER_SIZE];
-	//ÆÄÀÏÀ» ÀÔ·Â¹Þ±â À§ÇØ ÀÐ±â ½ºÆ®¸² »ý¼ºÇÏ¿© ÆÄÀÏÀ» ¿­°í 2Â÷¿ø ¹®ÀÚ¿­ ¹è¿­¿¡ ÆÄÀÏ ³»¿ë ÀÔ·Â
-	ifstream fin;
-	fin.open("CSVLoader_Data.txt");
-	if (!fin)
-	{
-		cout << "Error" << std::endl;
-	}
-	i = 0;
-	while (!fin.eof())
-	{
-		fin.getline(DATA[i], MAX_BUFFER_SIZE);
-		i++;		//Çà °³¼ö
-	}
-	i--;	//97Çà+1 ¿¡¼­ eof Ã¼Å©Çß±â ¶§¹®¿¡ -1
-	while (DATA[k][j] != NULL)
-	{
-		if (DATA[k][j] != ',' && DATA[k][j] != ' ' && key == 0)		//,³ª °ø¹éÀÌ ÀÔ·ÂµÇÁö ¾Ê¾Ò´Ù¸é = µ¥ÀÌÅÍ
-		{
-			key = 1;												//µ¥ÀÌÅÍÀÓÀ» È®ÀÎÇÏ´Â Å°
-		}
-		if (key == 1 && (DATA[k][j] == ',' || DATA[k][j] == ' ' || DATA[k][j + 1] == NULL))		//µ¥ÀÌÅÍ°¡ ,³ª °ø¹éÀ» ¸¸³ª°Å³ª ¹®ÀÚ¿­ÀÇ ³¡ ¹Ù·Î ÀÌÀüÀÌ¸é
-		{
-
-			key = 0;																			//µ¥ÀÌÅÍ°¡ ³¡³²
-			cnt++;																		//µ¥ÀÌÅÍÀÇ °³¼ö
-		}
-		j++;
-	}
-	//ÆÄÀÏ¿¡¼­ ÀÔ·Â¹Þ¾Æ¿À¸é¼­ ±¸ÇÑ Çà,¿­ °ªÀ» ±¸ÇÑ ÈÄ CSVÇÑ °ªÀ» ³ÖÀ» data ÀÌÁß Æ÷ÀÎÅÍ º¯¼ö¿¡ ¸Þ¸ð¸® ÇÒ´ç
-	rows = i;
-	cols = cnt;
-	data = new float* [rows];
-	for (i = 0; i < rows; i++)
-	{
-		data[i] = new float[cols];
-	}
-	key = 0;
-	k = 0;
-	//Çà°ú ¿­ÀÇ ±æÀÌ¸¸Å­ float º¯¼ö·Î ¹Ù²Ù¾î ÀÔ·Â
-	for (i = 0; i < rows; i++)
-	{
-		j = 0;
-		k = 0;
-		while (DATA[i][k] != NULL)
-		{
-			if (DATA[i][k] != ',' && DATA[i][k] != ' ' && key == 0)
-			{
-				key = 1;
-				data[i][j] = atof(DATA[i]);						//µ¥ÀÌÅÍ¸¦ floatÀ¸·Î º¯ÇüÇØ private data¿¡ ÀÔ·Â
-				j++;
-			}
-			if (key == 1 && (DATA[i][k] == ',' || DATA[i][k] == ' ' || DATA[i][k + 1] == NULL))
-			{
-				key = 0;
-			}
-			DATA[i][k] = ' ';
-			k++;
-		}
-	}
-	fin.close();
-	for (i = 0; i < MAX_BUFFER_SIZE; i++)
-		delete[] DATA[i];
-	delete[] DATA;
-}
-void CSVLoader::print(void)
-{
-	for (int i = 0; i < rows; i++)
-	{
-		cout << i+1 << ": ";
-		for (int j = 0; j < cols; j++)
-		{
-			cout << data[i][j] << "  ";
-		}
-		cout << endl;
-	}
+void CSVLoader::print() {
+    for (int i=0; i<rows; ++i) {
+        cout << i+1 << ": ";
+        for (int j=0; j<cols; ++j) cout << data[i][j] << "  ";
+        cout << endl;
+    }
 }

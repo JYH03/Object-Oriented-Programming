@@ -1,12 +1,13 @@
+// ìƒì„±ìì™€ ì†Œë©¸ìì—ì„œ ê°ì²´ì˜ ê°’ì„ ì¶œë ¥í•œë‹¤.
 #include "A.h"
 
-A::A(double n)												//»ı¼ºÀÚ
+A::A(double n)												
 {
-	N = n;													//private NÀ¸·Î Á¢±ÙÇØ °ª ÀÔ·Â
-	cout << "Class A is created with " << N << endl;		// privateÀÇ N Ãâ·Â
+	N = n;													
+	cout << "Class A is created with " << N << endl;		
 }
 
-A::~A()														//¼Ò¸êÀÚ
+A::~A()														
 {
-	cout << "Class A is destroyed with " << N << endl;		//private N Ãâ·Â
+	cout << "Class A is destroyed with " << N << endl;		
 }

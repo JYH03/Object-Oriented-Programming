@@ -1,40 +1,70 @@
 #include "Employee.h"
-Empoloyee::Empoloyee()
-{
-	//���� �ʱ�ȭ ����
+
+#include <cstring>
+#include <iostream>
+
+namespace {
+const char* emptyIfNull(const char* text) {
+    return text ? text : "";
 }
-Empoloyee::Empoloyee(char* name, int age, char* country, char* job)
-{
-		Empoloyee::name = name;
-		Empoloyee::age = age;
-		Empoloyee::country = country;
-		Empoloyee::job = job;
+
+char* copyText(const char* text) {
+    text = emptyIfNull(text);
+    const auto size = std::strlen(text) + 1;
+    char* copy = new char[size];
+    std::memcpy(copy, text, size);
+    return copy;
 }
-void Empoloyee::change(char* name, int age, char* country, char* job)
-{
-	
+
+void exchangeText(char*& left, char*& right) noexcept {
+    char* previous = left;
+    left = right;
+    right = previous;
 }
-void Empoloyee::print()
-{
-	cout << "Name: " << name << endl << "Age: " << age << endl << "Country: " << country << endl << "Job: " << job << endl;
-	cout
 }
-void link::make()
-{
-	ptr = new Empoloyee;
-	if (head == nullptr)
-	{
-		head = tail = ptr;
-		head->pNext = nullptr;
-	}
-	else
-	{
-		tail->pNext = ptr;
-		tail = ptr;
-		tail->pNext = NULL;
-	}
+
+Employee::Employee() noexcept : name(nullptr), age(0), country(nullptr), job(nullptr) {}
+
+Employee::Employee(const char* initialName, int initialAge, const char* initialCountry, const char* initialJob)
+    : Employee() {
+    name = copyText(initialName);
+    country = copyText(initialCountry);
+    job = copyText(initialJob);
+    age = initialAge;
 }
-void link::movedata()
-{
-	tail->
+
+Employee::Employee(const Employee& other)
+    : Employee(other.name, other.age, other.country, other.job) {}
+
+Employee& Employee::operator=(const Employee& other) {
+    if (this != &other)
+        change(other.name, other.age, other.country, other.job);
+    return *this;
 }
+
+Employee::~Employee() {
+    delete[] name;
+    delete[] country;
+    delete[] job;
+}
+
+bool Employee::isNameCorrect(const char* candidate) const {
+    return candidate && std::strcmp(emptyIfNull(name), candidate) == 0;
+}
+
+void Employee::print() const {
+    std::cout << "Name: " << emptyIfNull(name) << '\n'
+              << "Age: " << age << '\n'
+              << "Country: " << emptyIfNull(country) << '\n'
+              << "Job: " << emptyIfNull(job) << '\n';
+}
+
+void Employee::change(const char* newName, int newAge, const char* newCountry, const char* newJob) {
+    // 새 정보를 모두 복사한 뒤 기존 문자열의 소유권을 교환한다.
+    Employee replacement(newName, newAge, newCountry, newJob);
+    exchangeText(name, replacement.name);
+    exchangeText(country, replacement.country);
+    exchangeText(job, replacement.job);
+    age = newAge;
+}
+

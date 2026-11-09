@@ -1,7 +1,6 @@
-﻿// 01반_02반_2022202078_조영훈 2-2주차 3번.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
+// 5차 과제 3번: 기존 프로그램의 오류를 점검한 수정본
 #include "CSVLoader.h"
+using namespace std;
 
 int main()
 {
@@ -11,7 +10,10 @@ int main()
 	cout << "Cols: ";
 	cout << CSVLoader.getCols()<<endl;
 	cout << "Second Data: ";
-	cout << CSVLoader.getData()[0][1]<<endl;
+	if (CSVLoader.getRows() > 0 && CSVLoader.getCols() > 1)
+		cout << CSVLoader.getData()[0][1] << endl;
+	else
+		cout << "unavailable" << endl;
 	cout << "print all data: " << endl;
 	CSVLoader.print();
 

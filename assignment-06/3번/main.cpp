@@ -1,20 +1,43 @@
-﻿// 01반_02반_2022202078_조영훈 2-3주차 3번.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
+// 수동 배열과 연결 구조를 사용하는 과제 코드. 표준 컨테이너는 사용하지 않는다.
+#include "oopstd.h"
 #include <iostream>
-
-int main()
-{
-    std::cout << "Hello World!\n";
+using namespace std;
+int main() {
+    oopstd::string a;
+    a.assign("Hi");
+    cout << a.c_str() << endl << endl;
+    oopstd::string example("Hello World");
+    cout << example.at(2) << endl << endl;
+    const char *b = example.c_str();
+    cout << b << endl << endl;
+    oopstd::string example2("Hello World");
+    example2.clear();
+    cout << example2.c_str() << endl << endl;
+    oopstd::string example3("Hello World");
+    example3.push_back('b');
+    cout << example3.c_str() << endl << endl;
+    oopstd::string ex1("HELLO");
+    cout << ex1.compare("Hello") << endl
+         << ex1.compare("HELLO") << endl
+         << ex1.compare("HA") << endl
+         << endl;
+    oopstd::string example4("Hello World");
+    cout << example4.replace(0, 5, "Hi").c_str() << endl << endl;
+    oopstd::string example5 = "Hello World";
+    oopstd::string e = example5.substr(5, 10);
+    cout << e.c_str() << endl << endl;
+    oopstd::string example6 = "Hello World";
+    cout << example6.find("World") << endl << endl;
+    oopstd::string number = "10bus";
+    size_t sz;
+    int num = oopstd::stoi(number, &sz, 10);
+    cout << num << endl << sz << endl << endl;
+    oopstd::string float_number = "1.5abc";
+    size_t sz1;
+    float value = oopstd::stof(float_number, &sz1);
+    cout << value << endl << sz1 << endl << endl;
+    oopstd::string y = oopstd::to_string(123);
+    cout << y.c_str() << endl << endl;
+    oopstd::string z = oopstd::to_string(static_cast<float>(-24.3));
+    cout << z.c_str() << endl << endl;
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file

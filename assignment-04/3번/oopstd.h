@@ -1,3 +1,4 @@
+// ë¬¸ìì—´ ë° ë©”ëª¨ë¦¬ í•¨ìˆ˜ì˜ ê²½ê³„ì™€ ë°˜í™˜ê°’ì„ ìˆ˜ì •í•œ ë²„ì „
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
@@ -11,120 +12,99 @@ namespace oopstd
 {
 	void* memset(void* ptr, int value, size_t num)
 	{
-		unsigned char* str;				//charÇü Æ÷ÀÎÅÍ ¼±¾ğ
-		str = (unsigned char*)ptr;		//void·Î ÀÔ·Â¹Ş¾Æ charÇüÀ¸·Î ÀÎ½Ä
-		for (int i = 0; i < num; i++)	//Å©±â ¸¸Å­
+		unsigned char* str;				
+		str = (unsigned char*)ptr;		
+		for (int i = 0; i < num; i++)	
 		{
-			str[i] = value;				//°ª ÀÔ·Â
+			str[i] = value;				
 		}
-		return (void*)str;				//¹İÈ¯
+		return (void*)str;				
 	}
 	void* memcpy(void* destination, const void* source, size_t num)
 	{
 		int i;
-		unsigned char* str1 = (unsigned char*)destination;	//void·Î ÀÔ·Â¹Ş¾Æ charÇüÀ¸·Î ÀÎ½Ä ÈÄ Æ÷ÀÎÅÍ ÁöÁ¤
+		unsigned char* str1 = (unsigned char*)destination;	
 		unsigned char* str2 = (unsigned char*)source;
 		for (i = 0; i < num; i++)
 		{
-			str1[i] = str2[i];				//°ª º¹»ç
+			str1[i] = str2[i];				
 		}
-		return (void*)str1;					//¹İÈ¯
+		return (void*)str1;					
 	}
 	int strcmp(const char* str1, const char* str2)
 	{
-		while (*str1 && *str2)			//°°Àº µ¿¾È °Ë»ç ÁøÇà
+		while (*str1 && *str2)			
 		{
-			if (*str1 != *str2)			//´Ù¸£¸é
+			if (*str1 != *str2)			
 			{
-				return (*str1 < *str2) ? -1 : 1;		//Ã³À½ °ªÀÌ ´õ ÀÛÀ¸¸é -1 ±×·¸Áö ¾ÊÀ¸¸é 1 ¹İÈ¯
+				return (static_cast<unsigned char>(*str1) < static_cast<unsigned char>(*str2)) ? -1 : 1;		
 			}
-			str1++, str2++;								//´ÙÀ½ ±ÛÀÚ·Î ÁøÇà
+			str1++, str2++;								
 		}
-		if (*str1 != *str2)								//±ÛÀÚ¼ö Â÷ÀÌ °í·Á
-			return(*str1 < *str2) ? -1 : 1;
-		return 0;										//¹İÈ¯
+		if (*str1 != *str2)								
+			return (static_cast<unsigned char>(*str1) < static_cast<unsigned char>(*str2)) ? -1 : 1;
+		return 0;										
 	}
 	int strncmp(const char* str1, const char* str2, size_t num)
 	{
-		for (int i = 0; i < num; i++)					//Å©±â¸¸Å­
-		{
-			if (*str1 != *str2)							//°Ë»ç
-			{
-				return (*str1 < *str2) ? -1 : 1;		//Ã³À½ °ªÀÌ ´õ ÀÛÀ¸¸é -1 ±×·¸Áö ¾ÊÀ¸¸é 1 ¹İÈ¯
-			}
-			str1++, str2++;								//ÁøÇà
+		for (size_t i = 0; i < num; ++i) {
+			unsigned char a = static_cast<unsigned char>(str1[i]);
+			unsigned char b = static_cast<unsigned char>(str2[i]);
+			if (a != b) return a < b ? -1 : 1;
+			if (a == 0) return 0;
 		}
 		return 0;
 	}
+
 	char* strcpy(char* destination, const char* source)
 	{
-		while (*source)								//º¹»çÇÏ°íÀÚ ÇÏ´Â ¹®ÀÚ¿­ ¸¸Å­
-		{
-			*destination++ = *source++;				//º¹»ç
-		}
-		*destination = '\0';						//¹®ÀÚ¿­ÀÇ ³¡À» ¾Ë¸®´Â '\0'
-		return destination;							//¹İÈ¯
+		char* begin = destination;
+		while ((*destination++ = *source++) != '\0') {}
+		return begin;
 	}
 	char* strncpy(char* destination, const char* source, size_t num)
 	{
-		int i;
-		for (i = 0; i < num; i++)				//ÀÔ·Â¹ŞÀº Å©±â¸¸Å­
-		{
-			destination[i] = source[i];			//º¹»ç
-		}
-		return destination;						//¹İÈ¯
+		size_t i = 0;
+		for (; i < num && source[i] != '\0'; ++i) destination[i] = source[i];
+		for (; i < num; ++i) destination[i] = '\0';
+		return destination;
 	}
+
 	size_t strlen(const char* str)
 	{
 		int num = 0;
-		while (*str)						//¹®ÀÚ¿­ ¸¸Å­
+		while (*str)						
 		{
-			num++;							//Ä«¿îÆ®
-			*str++;							//¹®ÀÚ¿­ ÁøÇà
+			num++;							
+			*str++;							
 		}
-		return num;							//¹İÈ¯
+		return num;							
 	}
-	int	atoi(const char* str)
-	{
-		int i = 0;
-		int num = 0;
-		int cnt = -1;
-		while (str[i++] != '\0')		//¹®ÀÚ¿­ÀÇ ±æÀÌ
-		{
-			cnt++;						//Ä«¿îÆ®-1
-		}
-		while (*str)
-		{
-			num += (*str - '0') * pow(10, cnt--);				//°¢ ÀÚ¸®¼ö´Â 10^(Ä«¿îÆ® -1) * ÀÚ¸®ÀÇ °ª, Ä«¿îÆ®-1Àº À§¿¡¼­ ÇØ°áÇÔ
-			*str++;												//ÁøÇà
-		}
-		return num;												//¹İÈ¯
-	}
-	float atof(const char* str)
-	{
-		int i = 0;
-		int cnt = 0;
-		float num = 0;
-		while (str[i] != '.' && str[i] != '\0')				//¹®ÀÚ¿­ÀÇ ³¡ÀÌ°Å³ª .À» ¸¸³¯ ¶§ ±îÁö
-		{
-			cnt++;											//Ä«¿îÆ®
-			i++;
-		}
-		while (*str != '.' && *str != '\0')					//¹®ÀÚ¿­ÀÇ ³¡ÀÌ°Å³ª .À» ¸¸³¯ ¶§ ±îÁö
-		{
-			num += (*str - '0') * pow(10, --cnt);			//°¢ ÀÚ¸®¼ö´Â 10^(Ä«¿îÆ® -1) * ÀÚ¸®ÀÇ °ª
-			*str++;											//ÁøÇà
-		}
-		if (*str == '.')									//.À» ¸¸³ª¸é
-		{
-			*str++;											//.´ÙÀ½ ÀÚ¸®·Î ÁøÇà
-			while (*str != '\0')							//¹®ÀÚ¿­ÀÇ ³¡±îÁö
-			{
-				num += (*str - '0') * pow(10, --cnt);		//°¢ ÀÚ¸®¼ö´Â 10^(Ä«¿îÆ® -1) * ÀÚ¸®ÀÇ °ª
-				*str++;										//ÁøÇà
-			}
-		}
-		return num;											//¹İÈ¯
-	}
-
+	int atoi(const char* str) {
+        while ((*str == ' ' || *str == '\t' || *str == '\n' || *str == '\r' || *str == '\v' || *str == '\f')) ++str;
+        int sign = 1;
+        if (*str == '-' || *str == '+') { if (*str == '-') sign = -1; ++str; }
+        int value = 0;
+        while (*str >= '0' && *str <= '9') value = value * 10 + (*str++ - '0');
+        return sign * value;
+    }
+    double atof(const char* str) {
+        while ((*str == ' ' || *str == '\t' || *str == '\n' || *str == '\r' || *str == '\v' || *str == '\f')) ++str;
+        int sign = 1;
+        if (*str == '-' || *str == '+') { if (*str == '-') sign = -1; ++str; }
+        double value = 0;
+        while (*str >= '0' && *str <= '9') value = value * 10 + (*str++ - '0');
+        if (*str == '.') {
+            ++str; double place = 0.1;
+            while (*str >= '0' && *str <= '9') { value += (*str++ - '0') * place; place *= 0.1; }
+        }
+        if (*str == 'e' || *str == 'E') {
+            const char* exp = str + 1; int esign = 1;
+            if (*exp == '-' || *exp == '+') { if (*exp == '-') esign = -1; ++exp; }
+            int power = 0;
+            while (*exp >= '0' && *exp <= '9') { power = power * 10 + (*exp++ - '0'); if (power > 10000) { power = 10000; break; } }
+            value *= std::pow(10.0, esign * power);
+        }
+        return sign * value;
+    }
 }
